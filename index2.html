@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Before/After 拖曳效果</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f4f4f4;
+    }
+
+    .container {
+      position: relative;
+      width: 600px;
+      height: 400px;
+      overflow: hidden;
+    }
+
+    .before, .after {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .after {
+      clip-path: inset(0 50% 0 0); /* 初始遮罩效果 */
+    }
+
+    .divider {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 5px;
+      height: 100%;
+      background: #fff;
+      cursor: ew-resize;
+      z-index: 10;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="beforeAfterContainer">
+    <img src="./images/slide/bg_1.jpg" title="Before Title" alt="Before" class="before">
+    <img src="./images/slide/bg_2.jpg" title="After Title" alt="After" class="after">
+    <div class="divider"></div>
+  </div>
+
+  <script>
+    const container = document.getElementById('beforeAfterContainer');
+    const divider = container.querySelector('.divider');
+    const afterImage = container.querySelector('.after');
+
+    let isDragging = false;
+
+    container.addEventListener('mousedown', (e) => {
+      isDragging = true;
+    });
+
+    document.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+
+      const rect = container.getBoundingClientRect();
+      let offsetX = e.clientX - rect.left;
+
+      // 限制拖曳範圍
+      if (offsetX < 0) offsetX = 0;
+      if (offsetX > rect.width) offsetX = rect.width;
+
+      const percentage = (offsetX / rect.width) * 100;
+
+      // 更新遮罩與分隔條位置
+      afterImage.style.clipPath = `inset(0 ${100 - percentage}% 0 0)`;
+      divider.style.left = `${percentage}%`;
+    });
+  </script>
+</body>
+</html>
